@@ -11,8 +11,8 @@ import tkinter as tk
 RENODE_HOST = "127.0.0.1"
 RENODE_PORT = 3334
 
-LED_P0_ADDR = 0x2000FFF0
-LED_P1_ADDR = 0x2000FFF4  # firmware writes packed P0+P1 output
+LED_P0_ADDR = 0x2000FFF4
+LED_P1_ADDR = 0x2000FFF0  # firmware writes packed P0+P1 output
 FADER_MIRROR_BASE = 0x2000FFE0  # GUI writes fader values here
 
 W = 600
@@ -281,7 +281,6 @@ class SP1GUI:
             try:
                 out0 = self.renode.read32(LED_P0_ADDR)
                 out1 = self.renode.read32(LED_P1_ADDR)
-                print(f"[gui] P0=0x{out0:08X} P1=0x{out1:08X}", flush=True)
                 for name, (addr, pin) in self.led_map.items():
                     val = out1 if addr == LED_P1_ADDR else out0
                     color = self.WHITE if (val >> pin) & 1 else self.OFF
