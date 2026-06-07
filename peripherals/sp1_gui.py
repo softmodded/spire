@@ -11,7 +11,8 @@ import tkinter as tk
 RENODE_HOST = "127.0.0.1"
 RENODE_PORT = 3334
 
-LED_MIRROR_ADDR   = 0x2000FFF0  # firmware writes packed P0+P1 output
+LED_P0_ADDR = 0x2000FFF0
+LED_P1_ADDR = 0x2000FFF4  # firmware writes packed P0+P1 output
 FADER_MIRROR_BASE = 0x2000FFE0  # GUI writes fader values here
 
 W = 600
@@ -227,15 +228,11 @@ class SP1GUI:
 
     def _fader_start(self, event):
         for i, (fx, fy, fh, tid, kid) in enumerate(self.fader_widgets):
-            x0 = fx - 20
+            x0 = fx - 30
+            x2 = fx + 30
             y0 = fy
-            x2 = fx + 20
             y2 = fy + fh
-            bx, by = event.x, event.y
-            if b'body' in str(self.body):
-                bx = event.x
-                by = event.y
-            if x0 <= bx <= x2 and y0 <= by <= y2:
+            if x0 <= event.x <= x2 and y0 <= event.y <= y2:
                 self._dragging = i
                 break
 
@@ -274,17 +271,18 @@ class SP1GUI:
 
     def _start_polling(self):
         self.led_map = {
-            "p1": (1, 13), "p2": (0, 0), "p3": (1, 12), "p4": (0, 1),
-            "t1": (0, 29), "t2": (0, 26), "t3": (1, 15), "t4": (1, 14),
+            "p1": (LED_P1_ADDR, 13), "p2": (LED_P0_ADDR, 0),
+            "p3": (LED_P1_ADDR, 12), "p4": (LED_P0_ADDR, 1),
+            "t1": (LED_P0_ADDR, 29), "t2": (LED_P0_ADDR, 26),
+            "t3": (LED_P1_ADDR, 15), "t4": (LED_P1_ADDR, 14),
         }
 
         def poll():
             try:
-                packed = self.renode.read32(LED_MIRROR_ADDR)
-                out0 = packed & 0xFFFF
-                out1 = (packed >> 16) & 0xFFFF
-                for name, (port, pin) in self.led_map.items():
-                    val = out1 if port == 1 else out0
+                out0 = self.renode.read32(LED_P0_ADDR)
+                out1 = self.renode.read32(LED_P1_ADDR)
+                for name, (addr, pin) in self.led_map.items():
+                    val = out1 if addr == LED_P1_ADDR else out0
                     color = self.WHITE if (val >> pin) & 1 else self.OFF
                     if name in self.led_widgets and name in self._led_canvases:
                         self._led_canvases[name].itemconfigure(
