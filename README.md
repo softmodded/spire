@@ -43,7 +43,7 @@ this opens renode with the sp-1 platform and the virtual device gui with your fi
 | function button | clickable | p0.27, active low with pull-up |
 | play/track buttons | clickable | resistor ladder via adc |
 | i2c bus | stub | cs42l42 at 0x48, tas2505 at 0x18 |
-| i2s audio | waveform + wav | 48khz 24-bit output captured |
+| i2s audio | stub | 48khz 24-bit output captured |
 | emmc storage | stub | 4gb block device |
 | wdt | full | nrf52840 hardware model |
 | power / system_off | full | power peripheral model |
