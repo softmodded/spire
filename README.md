@@ -29,18 +29,10 @@ pip3 install tkinter
 
 ```bash
 cd spire
-./run.sh
+./run.sh [path/to/firmware.elf]
 ```
 
-this opens renode with the sp-1 platform and the virtual device gui.
-
-### load firmware
-
-in the renode console:
-
-```
-include @sp1.resc firmware=../build/app/zephyr/zephyr.elf
-```
+this opens renode with the sp-1 platform and the virtual device gui with your firmware booting.
 
 ## virtual device
 
